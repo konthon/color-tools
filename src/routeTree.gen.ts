@@ -18,6 +18,7 @@ import { Route as rootRoute } from './routes/__root'
 
 const IndexLazyImport = createFileRoute('/')()
 const OpacifyIndexLazyImport = createFileRoute('/opacify/')()
+const ThemePaletteLazyImport = createFileRoute('/theme/palette')()
 
 // Create/Update Routes
 
@@ -31,6 +32,11 @@ const OpacifyIndexLazyRoute = OpacifyIndexLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/opacify/index.lazy').then((d) => d.Route))
 
+const ThemePaletteLazyRoute = ThemePaletteLazyImport.update({
+  path: '/theme/palette',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/theme/palette.lazy').then((d) => d.Route))
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -40,6 +46,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/theme/palette': {
+      id: '/theme/palette'
+      path: '/theme/palette'
+      fullPath: '/theme/palette'
+      preLoaderRoute: typeof ThemePaletteLazyImport
       parentRoute: typeof rootRoute
     }
     '/opacify/': {
@@ -56,6 +69,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
+  ThemePaletteLazyRoute,
   OpacifyIndexLazyRoute,
 })
 
@@ -68,11 +82,15 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/theme/palette",
         "/opacify/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/theme/palette": {
+      "filePath": "theme/palette.lazy.tsx"
     },
     "/opacify/": {
       "filePath": "opacify/index.lazy.tsx"
