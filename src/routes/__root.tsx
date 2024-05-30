@@ -1,6 +1,18 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-import { FC } from 'react'
+import { FC, lazy } from 'react'
+import { Helmet } from 'react-helmet-async'
+
+const TanStackRouterDevtools =
+  process.env.NODE_ENV === 'production'
+    ? () => null // Render nothing in production
+    : lazy(() =>
+        // Lazy load in development
+        import('@tanstack/router-devtools').then((res) => ({
+          default: res.TanStackRouterDevtools,
+          // For Embedded Mode
+          // default: res.TanStackRouterDevtoolsPanel
+        })),
+      )
 
 const Root: FC = () => (
   <>
@@ -10,6 +22,9 @@ const Root: FC = () => (
       </Link>
     </div>
     <hr /> */}
+    <Helmet>
+      <title>Color tools</title>
+    </Helmet>
     <Outlet />
     <TanStackRouterDevtools />
   </>
