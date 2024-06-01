@@ -1,9 +1,10 @@
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import { createLazyFileRoute, useRouter } from '@tanstack/react-router'
 import { opacify, parseToRgba, readableColorIsBlack } from 'color2k'
-import { Slider } from 'components/Slider'
 import { FC, useDeferredValue, useMemo, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+
+import { Slider } from 'components/Slider'
 import { cn } from 'utils/style'
 
 const getBlendedAlpha = ([r, g, b, a]: [number, number, number, number]) => [
