@@ -7,8 +7,10 @@ import { Helmet } from 'react-helmet-async'
 
 import { Slider } from 'components/Slider'
 import { cn } from 'utils/style'
+
 import CopyableResult from './components/CopyableResult'
 
+const HEX_COLOR_PATTERN = '^#(?:[0-9a-fA-F]{3,4}){1,2}$'
 const WHITE_BACKGROUND = [255, 255, 255]
 const getWhiteBlended = ([r, g, b, a]: [number, number, number, number]) => [
   Math.round((1 - a) * WHITE_BACKGROUND[0] + a * r),
@@ -18,19 +20,25 @@ const getWhiteBlended = ([r, g, b, a]: [number, number, number, number]) => [
 const getHex = (color: number[]) =>
   `#${color.map((c) => c.toString(16).padStart(2, '0')).join('')}`
 
+const validateColorInput = (value: string) => {
+  const newHexCode = (value.match(/^#*[0-9a-fA-F]{0,6}/) || []).join('')
+  if (newHexCode.startsWith('#')) {
+    return newHexCode.slice(0, 7)
+  }
+  return `#${newHexCode.slice(0, 6)}`
+}
+
 const OpacifyPage: FC = () => {
   const router = useRouter()
   const [hexCode, setHexCode] = useState('#FFFFFF')
   const [opacity, setOpacity] = useState(100)
-  const deferredHexCode = useDeferredValue(hexCode)
+  const deferredHexCode = useDeferredValue(hexCode.padEnd(7, 'F'))
 
   const opacified = useMemo(
     () =>
       getHex(
         getWhiteBlended(
-          parseToRgba(
-            opacify(deferredHexCode.padEnd(7, 'F'), -(100 - opacity) / 100),
-          ),
+          parseToRgba(opacify(deferredHexCode, -(100 - opacity) / 100)),
         ),
       ).toUpperCase(),
 
@@ -73,18 +81,13 @@ const OpacifyPage: FC = () => {
                 <div className='flex items-center font-mono text-5xl'>
                   <div className='opacity-30'>#</div>
                   <input
-                    pattern='^#(?:[0-9a-fA-F]{3,4}){1,2}$'
+                    pattern={HEX_COLOR_PATTERN}
                     autoCapitalize='off'
                     autoComplete='off'
                     size={6}
                     value={hexCode.slice(1)}
                     onChange={(e) => {
-                      const newHexCode = e.target.value
-                      if (newHexCode.startsWith('#')) {
-                        setHexCode(newHexCode.slice(0, 6))
-                      } else {
-                        setHexCode(`#${newHexCode.slice(0, 6)}`)
-                      }
+                      setHexCode(validateColorInput(e.target.value))
                     }}
                     placeholder='FFFFFF'
                     className='bg-transparent uppercase outline-none'
